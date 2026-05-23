@@ -12,7 +12,6 @@ A Chrome extension that filters your LinkedIn feed so you can focus on **hiring 
 - [Optional: run the backend locally](#optional-run-the-backend-locally)
 - [Using the extension](#using-the-extension)
 - [Feed filter modes](#feed-filter-modes)
-- [Backend and AI classification](#backend-and-ai-classification)
 - [Project structure](#project-structure)
 - [Configuration](#configuration)
 - [Troubleshooting](#troubleshooting)
@@ -207,48 +206,6 @@ New users default to **show all posts** enabled (`showAllPosts: true`, other fla
    - “Collapse non-hiring posts”.
 
 Settings sync to the backend (`PATCH /auth/feed-settings`) and to `chrome.storage.local` so the content script updates without reloading the page.
-
----
-
-## Backend and AI classification
-
-The API (`linkedin-extension/`, NestJS) provides authentication, user profiles, persisted feed settings, and post classification.
-
-### Classification endpoint
-
-- **`POST /posts/is-hiring`** (JWT required)  
-- **Body:** `{ "text": "<post body>" }`  
-- **Response:** `{ "isHiring": boolean }`
-
-The model is prompted to answer only `true` or `false`:
-
-- **`true`** — Job openings, hiring, recruiting, etc.
-- **`false`** — Everything else
-
-Posts with **no extractable text** (e.g. image-only) are treated as non-hiring when filtering is active and follow your hide/collapse mode without calling the API.
-
-### Load balancing between AI providers (Groq)
-
-To handle volume and rate limits, the backend **rotates across multiple Groq API keys** (a pool of keys). Behavior:
-
-1. **Round-robin** — Each request uses the next available key in the pool.
-2. **429 handling** — If a key hits a rate limit, the service **automatically retries** with the next key.
-3. **Daily token exhaustion** — Keys that hit Groq’s per-day token limit are **marked exhausted for the server session** and skipped until restart.
-4. **Fallback** — If all keys fail or are exhausted, the API returns `{ isHiring: false }` (conservative: post may be hidden/collapsed depending on mode).
-
-The classifier model used is **`llama-3.3-70b-versatile`** via the Groq SDK.
-
-This design spreads traffic across keys so classification stays available under LinkedIn feed load without relying on a single API quota.
-
-### Other API routes (reference)
-
-| Method | Path | Description |
-|--------|------|-------------|
-| `POST` | `/auth/google` | Exchange Google access token for app JWT + user profile |
-| `GET` | `/auth/me` | Current user + `feedSettings` |
-| `PATCH` | `/auth/feed-settings` | Update one or more feed toggles |
-
-Production deployment: **`https://feed-filters.vercel.app`** (see `vercel.json` in `linkedin-extension/`).
 
 ---
 
