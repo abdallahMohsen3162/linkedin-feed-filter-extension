@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>LinkedIn Reader</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- LOGIN PAGE -->
+  <div id="loginPage" class="page">
+
+    <h1>LinkedIn Reader</h1>
+    <p class="subtitle">Sign in with your Google account to continue.</p>
+
+    <p id="loginError" class="error hidden"></p>
+
+    <button id="googleLoginBtn" type="button" class="google-btn">
+      <span class="google-icon" aria-hidden="true">G</span>
+      Continue with Google
+    </button>
+
+  </div>
+
+  <!-- DASHBOARD PAGE -->
+  <div id="dashboardPage" class="page hidden">
+
+    <div class="user-card">
+      <img id="userAvatar" class="user-avatar hidden" alt="" />
+      <div id="userAvatarFallback" class="user-avatar user-avatar-fallback hidden" aria-hidden="true"></div>
+
+      <div class="user-info">
+        <p id="userName" class="user-name"></p>
+        <p id="userEmail" class="user-email"></p>
+      </div>
+
+      <button id="logoutBtn" type="button" class="logout-btn">
+        Logout
+      </button>
+    </div>
+
+    <h2 class="section-title">Feed filters</h2>
+
+    <div class="toggle-row">
+      <span>Hide non-hiring posts</span>
+      <label class="switch">
+        <input type="checkbox" id="hideNonHiringPosts">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle-row">
+      <span>Collapse non-hiring posts</span>
+      <label class="switch">
+        <input type="checkbox" id="collapseNonHiringPosts">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle-row">
+      <span>Show all posts</span>
+      <label class="switch">
+        <input type="checkbox" id="showAllPosts">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <p id="settingsError" class="error hidden"></p>
+
+  </div>
+
+  <script src="config.js"></script>
+  <script src="popup.js"></script>
+
+</body>
+</html>

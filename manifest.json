@@ -1,0 +1,41 @@
+{
+  "manifest_version": 3,
+  "name": "LinkedIn Reader",
+  "version": "1.0.0",
+  "description": "Read LinkedIn posts",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAs1H1il/P0S+JHO1VTDQYhMElVs93yUA4OtTCJ57Bi/cikZHtnhxkfb3JtwA9h0kCBRqOlF9DzWlB3bhSKl9SxRjWIGPQbpXGzJsC2gqeFio89aczG6mXi2sSrji9BO9YdTkP4/4DVqr/UINu4JQ4QgiNvRDJyJcMYPTAjF5wHfGKRhdBNe9WJ2UD+mmhCA+JIkxNQLTeGMD2/dwSjf2oDrLU9t6bYi2Alpq0XKTlsUR2pXYn+r52V8jkDSwfdS22k2zX2nPF16Q3JQ9ehKQsugXMUHHfm/8KC8BnT+Zxknyvwr4ILopy8gzg7GxbhbLPL0Lc5205/JS/0IrUxttxAQIDAQAB",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "identity"
+  ],
+
+  "host_permissions": [
+    "https://www.linkedin.com/*",
+    "http://localhost:3000/*",
+    "http://localhost:3001/*"
+  ],
+  "oauth2": {
+    "client_id": "855098238672-lto9l8s7ip46buqm46o2rptqp99a67p7.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/userinfo.profile"
+    ]
+  },
+
+  "action": {
+    "default_popup": "popup.html"
+  },
+
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.linkedin.com/feed/*"
+      ],
+      "js": [
+        "config.js",
+        "content.js"
+      ]
+    }
+  ]
+}
