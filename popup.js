@@ -29,6 +29,13 @@ let currentFeedSettings = {
   showAllPosts: true,
 };
 
+function applyRadioBehaviour(selectedKey) {
+  feedToggles.forEach(({ el, key }) => {
+    el.checked = key === selectedKey;
+    el.disabled = false;
+  });
+}
+
 function showDashboard(user) {
   loginPage.classList.add("hidden");
   dashboardPage.classList.remove("hidden");
@@ -75,9 +82,11 @@ function applyFeedSettingsToUI(feedSettings = {}) {
     showAllPosts: feedSettings.showAllPosts ?? true,
   };
 
-  hideNonHiringPosts.checked = currentFeedSettings.hideNonHiringPosts;
-  collapseNonHiringPosts.checked = currentFeedSettings.collapseNonHiringPosts;
-  showAllPosts.checked = currentFeedSettings.showAllPosts;
+  let activeKey = "showAllPosts";
+  if (currentFeedSettings.hideNonHiringPosts) activeKey = "hideNonHiringPosts";
+  else if (currentFeedSettings.collapseNonHiringPosts) activeKey = "collapseNonHiringPosts";
+
+  applyRadioBehaviour(activeKey);
 }
 
 function showLoginError(message) {
@@ -255,29 +264,32 @@ logoutBtn.addEventListener("click", async () => {
 
 feedToggles.forEach(({ el, key }) => {
   el.addEventListener("change", async () => {
-    if (settingsSyncInProgress || !sessionToken) return;
+    if (!el.checked || settingsSyncInProgress || !sessionToken) return;
 
-    const snapshot = { ...currentFeedSettings };
-    const payload = { [key]: el.checked };
+    const previousKey = feedToggles.find(
+      ({ key: k }) => currentFeedSettings[k]
+    )?.key ?? "showAllPosts";
+
+    applyRadioBehaviour(key);
+
+    const payload = {
+      hideNonHiringPosts: key === "hideNonHiringPosts",
+      collapseNonHiringPosts: key === "collapseNonHiringPosts",
+      showAllPosts: key === "showAllPosts",
+    };
 
     settingsSyncInProgress = true;
     hideSettingsError();
-    feedToggles.forEach(({ el: toggle }) => {
-      toggle.disabled = true;
-    });
 
     try {
       const updatedUser = await updateFeedSettingsOnServer(sessionToken, payload);
       applyFeedSettingsToUI(updatedUser.feedSettings);
       await persistUserState(updatedUser, sessionToken);
     } catch (error) {
-      applyFeedSettingsToUI(snapshot);
+      applyRadioBehaviour(previousKey);
       showSettingsError(error.message || "Could not save settings");
     } finally {
       settingsSyncInProgress = false;
-      feedToggles.forEach(({ el: toggle }) => {
-        toggle.disabled = false;
-      });
     }
   });
 });
